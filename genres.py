@@ -82,7 +82,7 @@ def get_genre_stats_data():
                         break
             data.append({"genre": genre, "data": single})
 
-    # 计算总体水平并加入数据列表
+    # Add average data
     total0 = 0
     total1 = 0
     total2 = 0
@@ -120,14 +120,14 @@ def get_genre_stats_data():
         }
     )
 
-    # 为数据排序，rating3（通过测试）比例越高约靠前
+    # Rank by the percentage of passed rating3
     def sort_genre(elem):
         return elem["data"][0]["value"]
 
     data.sort(key=sort_genre)
     for d in data:
         final_data.extend(d["data"])
-    # 最终结果写入genre.json文件，绘制图表所使用的为该json数据
+    # Write final results into genre.json(used to generate charts)
     with open("./html/genre.json", "w") as f:
         json.dump(final_data, f)
 
