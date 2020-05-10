@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Demo</title>
+    </head>
+    <body>
+        <div id="container1" />
+        <div id="container2" />
+        <div id="container3" />
+        <script src="https://cdn.jsdelivr.net/npm/@antv/g2@4.0.7/dist/g2.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@antv/data-set@0.11.4/dist/data-set.js"></script>
+        <script>
+            fetch("./rating.json")
+                .then((res) => {
+                    return res.json();
+                })
+                .then((data) => {
+                    const dv = new DataSet.DataView().source(data);
+                    dv.transform({
+                        type: "percent",
+                        field: "value",
+                        dimension: "rating",
+                        groupBy: ["year"],
+                        as: "percent",
+                    });
+
+                    const chart = new G2.Chart({
+                        container: "container1",
+                        width: 800,
+                        height: 500,
+                    });
+                    chart.data(dv.rows);
+                    chart.scale({
+                        year: {
+                            type: "linear",
+                            tickInterval: 10,
+                        },
+                        percent: {
+                            formatter: (value) => {
+                                value = +value || 0;
+                                value = +value * 100;
+                                return value + "%";
+                            },
+                        },
+                    });
+                    chart.tooltip({
+                        showCrosshairs: true,
+                        shared: true,
+                    });
+
+                    chart
+                        .area()
+                        .adjust("stack")
+                        .position("year*percent")
+                        .color("rating", ["#f3722c", "#f9c74f", "#90be6d", "#43aa8b"])
+                        .shape("smooth")
+                        .style({ fillOpacity: 0.8 });
+                    chart
+                        .line()
+                        .adjust("stack")
+                        .position("year*percent")
+                        .color("rating", ["#f3722c", "#f9c74f", "#90be6d", "#43aa8b"])
+                        .shape("smooth");
+                    chart.render();
+                });
+            
+            
+                fetch("./country.json")
+                .then((res) => {
+                    return res.json();
+                })
+                .then((data) => {
+                    const chart = new G2.Chart({
+                        container: "container2",
+                        width: 600,
+                        height: 650,
+                    });
+                    chart.data(data);
+                    chart.axis("country", {
+                        tickLine: null,
+                        line: null,
+                        label: {
+                            style: {
+                                fontSize: 13,
+                                fontWeight: 400,
+                                fill: "#000",
+                                fontFamily: "monospace",
+                            },
+                        },
+                    });
+                    chart.axis("value", {
+                        title: null,
+                        label: {
+                            offset: 20,
+                            style: {
+                                fontSize: 13,
+                                fontWeight: 400,
+                                fill: "#000",
+                                fontFamily: "monospace",
+                            },
+                            formatter: (val) => {
+                                return val * 100 + "%";
+                            },
+                        },
+                        grid: null,
+                    });
+                    chart.legend({
+                        position: "top",
+                    });
+                    chart.coordinate("rect").transpose();
+                    chart.tooltip({
+                        showTitle: true,
+                        shared: true,
+                        showMarkers: false,
+                    });
+                    chart.interaction("active-region");
+                    chart
+                        .interval()
+                        .adjust("stack")
+                        .position("country*value")
+                        .color("rating*country", (rating, country) => {
+                            if (country === "All" && rating === "3") {
+                                return "#3C997D";
+                            }
+                            if (country === "All" && rating === "2") {
+                                return "#749957";
+                            }
+                            if (country === "All" && rating === "1") {
+                                return "#997A31";
+                            }
+                            if (country === "All" && rating === "0") {
+                                return "#99471C";
+                            }
+
+                            if (rating === "0") {
+                                return "#f3722c";
+                            }
+                            if (rating === "1") {
+                                return "#f9c74f";
+                            }
+                            if (rating === "2") {
+                                return "#90be6d";
+                            }
+                            if (rating === "3") {
+                                return "#43aa8b";
+                            }
+                        })
+                        .size(20)
+                        .tooltip("rating*value", (r, v) => {
+                            return {
+                                name: r,
+                                value: (v * 100).toFixed(2) + "%",
+                            };
+                        });
+                    chart.render();
+                });
+            fetch("./genre.json")
+                .then((res) => {
+                    return res.json();
+                })
+                .then((data) => {
+                    const chart = new G2.Chart({
+                        container: "container3",
+                        width: 600,
+                        height: 650,
+                    });
+                    chart.data(data);
+                    chart.axis("genre", {
+                        tickLine: null,
+                        line: null,
+                        label: {
+                            style: {
+                                fontSize: 13,
+                                fontWeight: 400,
+                                fill: "#000",
+                                fontFamily: "monospace",
+                            },
+                        },
+                    });
+                    chart.axis("value", {
+                        title: null,
+                        label: {
+                            offset: 20,
+                            style: {
+                                fontSize: 13,
+                                fontWeight: 400,
+                                fill: "#000",
+                                fontFamily: "monospace",
+                            },
+                            formatter: (val) => {
+                                return val * 100 + "%";
+                            },
+                        },
+                        grid: null,
+                    });
+                    chart.legend("rating", {
+                        position: "top",
+                    });
+                    chart.coordinate("rect").transpose();
+                    chart.tooltip({
+                        showTitle: true,
+                        shared: true,
+                        showMarkers: false,
+                    });
+                    chart.interaction("active-region");
+
+                    chart
+                        .interval()
+                        .adjust("stack")
+                        .position("genre*value")
+                        .color("rating*genre", (rating, genre) => {
+                            if (genre === "All" && rating === "3") {
+                                return "#3C997D";
+                            }
+                            if (genre === "All" && rating === "2") {
+                                return "#749957";
+                            }
+                            if (genre === "All" && rating === "1") {
+                                return "#997A31";
+                            }
+                            if (genre === "All" && rating === "0") {
+                                return "#99471C";
+                            }
+
+                            if (rating === "0") {
+                                return "#f3722c";
+                            }
+                            if (rating === "1") {
+                                return "#f9c74f";
+                            }
+                            if (rating === "2") {
+                                return "#90be6d";
+                            }
+                            if (rating === "3") {
+                                return "#43aa8b";
+                            }
+                        })
+                        .size(20)
+                        .tooltip("rating*value", (r, v) => {
+                            return {
+                                name: r,
+                                value: (v * 100).toFixed(2) + "%",
+                            };
+                        });
+                    chart.render();
+                });
+        </script>
+    </body>
+</html>
